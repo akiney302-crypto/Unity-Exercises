@@ -6,8 +6,12 @@ using UnityEngine;
 public class Wings : MonoBehaviour
 {
     #region Properties
-    public float Energy { get; private set; }
-    public bool IsFlying { get; private set; }
+    public float Energy { get; set; }
+    public bool IsFlying { get; set; }
+    public bool IsStunned { get; set; }
+    public bool IsWet { get; set; }
+
+    public float MovRalent => IsWet ? 0.5f : 1f;
     #endregion
 
     #region Fields
@@ -16,9 +20,11 @@ public class Wings : MonoBehaviour
     [SerializeField] private float _energyRegenerationRate = 10f;
     [SerializeField] private float _flyForce = 12f;
     [SerializeField] private float _maxFlySpeed = 5f;
+    [SerializeField] private float _wetMassMultiplier = 1.5f;
 
     private Rigidbody2D rb;
     private bool _isGrounded;
+    private float _baseMass;
     #endregion
 
     #region Unity Callbacks
@@ -26,6 +32,7 @@ public class Wings : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         Energy = _maxEnergy;
+        _baseMass = rb.mass;
     }
 
     private void FixedUpdate()
@@ -47,7 +54,12 @@ public class Wings : MonoBehaviour
     public void SetFlightRequested(bool requested, bool grounded)
     {
         _isGrounded = grounded;
-        IsFlying = requested && !_isGrounded && Energy > 0f;
+        if (IsStunned)
+        {
+            StopFlying();
+            return;
+        }
+        IsFlying = requested && !_isGrounded && Energy > 0f && !IsStunned;
     }
 
     public void FlyUp()
@@ -59,6 +71,29 @@ public class Wings : MonoBehaviour
     public void StopFlying()
     {
         IsFlying = false;
+    }
+
+    public void Stun(float duration)
+    {
+        IsStunned = true;
+        StopFlying();
+        CancelInvoke(nameof(RecoverFromStun));
+        Invoke(nameof(RecoverFromStun), duration);
+    }
+
+    public void Wet(float duration)
+    {
+        IsWet = true;
+        rb.mass = _baseMass * _wetMassMultiplier;
+        CancelInvoke(nameof(RemoveWet));
+        Invoke(nameof(RemoveWet), duration);
+    }
+
+    public void RemoveWet()
+    {
+        CancelInvoke(nameof(RemoveWet));
+        IsWet = false;
+        rb.mass = _baseMass;
     }
 
     public void Regenerate(float energy)
@@ -83,6 +118,11 @@ public class Wings : MonoBehaviour
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, _maxFlySpeed);
 
         Energy -= _energyFlyingRate * Time.fixedDeltaTime;
+    }
+
+    private void RecoverFromStun()
+    {
+        IsStunned = false;
     }
     #endregion  
 }

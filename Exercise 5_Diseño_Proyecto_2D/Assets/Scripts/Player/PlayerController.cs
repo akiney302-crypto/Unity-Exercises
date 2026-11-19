@@ -88,7 +88,8 @@ public class PlayerController : MonoBehaviour
 
     private void Move()
     {
-        rb.linearVelocity = new Vector2(horizontalInput * moveSpeed, rb.linearVelocity.y);
+        float speed = wings.IsStunned ? 0f : moveSpeed * wings.MovRalent;
+        rb.linearVelocity = new Vector2(horizontalInput * speed, rb.linearVelocity.y);
     }
 
     private void SpriteFlip()
@@ -105,7 +106,7 @@ public class PlayerController : MonoBehaviour
 
     private void Jump()
     {
-        if(jumpRequested && isGrounded)
+        if(!wings.IsStunned && jumpRequested && isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         }

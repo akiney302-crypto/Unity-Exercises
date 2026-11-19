@@ -6,35 +6,25 @@ public class AnimatorController : MonoBehaviour
 
 {
     #region Fields
-    [SerializeField] private Wings wings;
-    private Animator anim;
+    [SerializeField] private Wings _wings;
+    private Animator _anim;
     #endregion
 
 
     #region Unity Callbacks
     private void Awake()
     {
-        anim = GetComponent<Animator>();
+        _anim = GetComponent<Animator>();
     }
 
     void Update()
     {
-        if (wings.IsFlying)
-        {
-            SetFlying(true);
-        }
-        else
-        {
-            SetFlying(false);
-        }
+        _anim.SetBool("IsFlying", _wings.IsFlying);
     }
     #endregion
 
 
     #region Public Methods
-    public void SetFlying(bool isFlying)
-    {
-        anim.SetBool("IsFlying", isFlying);
-    }
+    
     #endregion
 }

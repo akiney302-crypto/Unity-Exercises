@@ -42,12 +42,14 @@ GameObject:
   - component: {fileID: 1686181778082469}
   - component: {fileID: 162170098101415912}
   - component: {fileID: 1156670331142625955}
+  - component: {fileID: 6760818601111640950}
   - component: {fileID: 9061490147256869304}
   - component: {fileID: 8185061262364767535}
   - component: {fileID: 7656089336339195694}
+  - component: {fileID: 3765161335107492592}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -87,7 +89,7 @@ MonoBehaviour:
   groundCheckHeight: 0.24
   groundLayer:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 72
   wings: {fileID: 1156670331142625955}
 --- !u!114 &1156670331142625955
 MonoBehaviour:
@@ -106,6 +108,19 @@ MonoBehaviour:
   _energyRegenerationRate: 8
   _flyForce: 40
   _maxFlySpeed: 7
+--- !u!114 &6760818601111640950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7117152873669719461}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eddfb02fea0221446b7d8216b7a5460f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AnimatorController
+  _wings: {fileID: 1156670331142625955}
 --- !u!212 &9061490147256869304
 SpriteRenderer:
   serializedVersion: 2
@@ -229,3 +244,25 @@ CapsuleCollider2D:
   m_Offset: {x: -0.20114392, y: 0.017371178}
   m_Size: {x: 1.4022886, y: 1.6578225}
   m_Direction: 0
+--- !u!95 &3765161335107492592
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7117152873669719461}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
