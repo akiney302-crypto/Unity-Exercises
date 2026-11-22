@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask groundLayer;
 
     [SerializeField] private Wings wings;
+    [SerializeField] private PlayerStatus status;
 
     #endregion
 
@@ -33,6 +34,9 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+
+        if (status == null)
+            status = GetComponent<PlayerStatus>();
     }
 
     private void Update()
@@ -88,7 +92,16 @@ public class PlayerController : MonoBehaviour
 
     private void Move()
     {
-        float speed = wings.IsStunned ? 0f : moveSpeed * wings.MovRalent;
+        float speed;
+
+        if (status != null && status.IsStunned)
+            speed = 0f;
+        else
+        {
+            float movementRalent = status != null ? status.MovRalent : wings.MovRalent;
+            speed = moveSpeed * movementRalent;
+        }
+
         rb.linearVelocity = new Vector2(horizontalInput * speed, rb.linearVelocity.y);
     }
 
@@ -106,7 +119,9 @@ public class PlayerController : MonoBehaviour
 
     private void Jump()
     {
-        if(!wings.IsStunned && jumpRequested && isGrounded)
+        bool canJump = status == null || !status.IsStunned;
+
+        if(canJump && jumpRequested && isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
         }

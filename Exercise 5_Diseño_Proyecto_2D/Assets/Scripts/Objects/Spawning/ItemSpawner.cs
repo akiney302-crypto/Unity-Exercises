@@ -50,12 +50,13 @@ public class ItemSpawner : MonoBehaviour
             return;
 
         if (newItem.Type == Item.ItemType.Pebble)
-            newItem.SetSize();
-        else
         {
-            float torqueForce = Random.Range(-50f, 50f);
-            newItem.GetComponent<Rigidbody2D>().AddTorque(torqueForce);
+            ItemPebble pebble = newItem.GetComponent<ItemPebble>();
+
+            pebble.SetSize();
         }
+        float torqueForce = Random.Range(-100f, 100f);
+        newItem.GetComponent<Rigidbody2D>().AddTorque(torqueForce);
     }
     #endregion
 }

@@ -2,16 +2,17 @@ using UnityEngine;
 
 
 [RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(PlayerStatus))]
 
 public class Wings : MonoBehaviour
 {
     #region Properties
     public float Energy { get; set; }
     public bool IsFlying { get; set; }
-    public bool IsStunned { get; set; }
-    public bool IsWet { get; set; }
+    public bool IsStunned => _status != null && _status.IsStunned;
+    public bool IsWet => _status != null && _status.IsWet;
 
-    public float MovRalent => IsWet ? 0.5f : 1f;
+    public float MovRalent => _status != null ? _status.MovRalent : 1f;
     #endregion
 
     #region Fields
@@ -23,6 +24,7 @@ public class Wings : MonoBehaviour
     [SerializeField] private float _wetMassMultiplier = 1.5f;
 
     private Rigidbody2D rb;
+    private PlayerStatus _status;
     private bool _isGrounded;
     private float _baseMass;
     #endregion
@@ -31,8 +33,30 @@ public class Wings : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        _status = GetComponent<PlayerStatus>();
+
         Energy = _maxEnergy;
         _baseMass = rb.mass;
+    }
+
+    private void OnEnable()
+    {
+        _status = GetComponent<PlayerStatus>();
+
+        if (_status != null)
+        {
+            _status.StunChanged += HandleStunChanged;
+            _status.WetChanged += HandleWetChanged;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (_status != null)
+        {
+            _status.StunChanged -= HandleStunChanged;
+            _status.WetChanged -= HandleWetChanged;
+        }
     }
 
     private void FixedUpdate()
@@ -75,25 +99,17 @@ public class Wings : MonoBehaviour
 
     public void Stun(float duration)
     {
-        IsStunned = true;
-        StopFlying();
-        CancelInvoke(nameof(RecoverFromStun));
-        Invoke(nameof(RecoverFromStun), duration);
+        _status?.Stun(duration);
     }
 
     public void Wet(float duration)
     {
-        IsWet = true;
-        rb.mass = _baseMass * _wetMassMultiplier;
-        CancelInvoke(nameof(RemoveWet));
-        Invoke(nameof(RemoveWet), duration);
+        _status?.Wet(duration);
     }
 
     public void RemoveWet()
     {
-        CancelInvoke(nameof(RemoveWet));
-        IsWet = false;
-        rb.mass = _baseMass;
+        _status?.RemoveWet();
     }
 
     public void Regenerate(float energy)
@@ -120,9 +136,15 @@ public class Wings : MonoBehaviour
         Energy -= _energyFlyingRate * Time.fixedDeltaTime;
     }
 
-    private void RecoverFromStun()
+    private void HandleStunChanged(bool stunned)
     {
-        IsStunned = false;
+        if (stunned)
+            StopFlying();
+    }
+
+    private void HandleWetChanged(bool wet)
+    {
+        rb.mass = wet ? _baseMass * _wetMassMultiplier : _baseMass;
     }
     #endregion  
 }
